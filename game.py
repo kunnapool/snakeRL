@@ -79,13 +79,15 @@ class SnakeGame:
                 quit()
 
             if event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_LEFT:
+
+                # Don't allow 180 turns
+                if event.key == pygame.K_LEFT and self.direction != Direction.RIGHT:
                     self.direction = Direction.LEFT
-                elif event.key == pygame.K_DOWN:
+                elif event.key == pygame.K_DOWN and self.direction != Direction.UP:
                     self.direction = Direction.DOWN
-                elif event.key == pygame.K_UP:
+                elif event.key == pygame.K_UP and self.direction != Direction.DOWN:
                     self.direction = Direction.UP
-                elif event.key == pygame.K_RIGHT:
+                elif event.key == pygame.K_RIGHT and self.direction != Direction.LEFT:
                     self.direction = Direction.RIGHT
 
 
@@ -142,15 +144,18 @@ class SnakeGame:
 
 
 if __name__ == "__main__":
-    game = SnakeGame()
 
-    # main loop
     while True:
-        game_over, score = game.play_step()
+        game = SnakeGame()
 
-        if game_over:
-            break
+        # main loop
+        while True:
+            game_over, score = game.play_step()
 
-    print("Score: ", score)
+            if game_over:
+                break
 
-    pygame.quit()
+        print("Score: ", score)
+
+        # pygame.quit()
+        # pygame.init()
