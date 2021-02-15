@@ -8,11 +8,11 @@ from collections import namedtuple
 import torch
 
 
-class Direction(Enum):
-    RIGHT = 1
-    LEFT = 2
-    UP = 3
-    DOWN = 4
+class Direction(IntEnum):
+    RIGHT = 0
+    LEFT = 1
+    UP = 2
+    DOWN = 3
 
 class State(IntEnum):
     FOOD_UP = 0
@@ -35,7 +35,7 @@ BLUE2 = (0, 100, 255)
 
 
 BLOCK_SIZE = 20
-SPEED = 10
+SPEED = 100
 
 pygame.init()
 font = pygame.font.SysFont('arial', 25)
@@ -108,25 +108,32 @@ class SnakeGame:
         self.snake.insert(0, self.head)
         
         if self._is_collision():
-            return True, self.score
+            return True, None, -10 # negative reward for game over
         
-        self.get_state()
+        self.update_state()
         # print(self.snake)
-        print("\n\n")
+        # print("\n\n")
 
         if self.head == self.food:
             self.score += 1
             self._place_food()
+
+            self._update_ui()
+            self.clock.tick(SPEED)
+
+            # print("ATE FOOD")
+
+            return False, tuple(self.state), 1
         else:
+            # makes the snake "move" - tail leaves the current block
             self.snake.pop()
 
-        self._update_ui()
-        self.clock.tick(SPEED)
+            self._update_ui()
+            self.clock.tick(SPEED)
 
-        return False, self.score
+            return False, tuple(self.state), -1
 
-
-    def _get_food_state(self, h, f):
+    def _update_food_state(self, h, f):
         # food is towards right
         if h.x < f.x:
             self.state[State.FOOD_RIGHT] = 1
@@ -141,34 +148,29 @@ class SnakeGame:
         elif h.y > f.y:
             self.state[State.FOOD_UP] = 1
 
-    def _get_collision_state(self):
-        
-
-        def check_self_collision(self):
-            
-            pass
+    def _update_collision_state(self):
 
         # wall is right or self collision is right
         if self.head.x + BLOCK_SIZE == self.w or ( (self.head.x + BLOCK_SIZE) in [s.x for s in self.snake[1:] if self.head.y == s.y] and self.direction != Direction.LEFT):
             self.state[State.COLLISION_RIGHT] = 1
-            print("COLLISION RIGHT")
+            # print("COLLISION RIGHT")
 
         # wall is left or self collision is left
         if self.head.x == 0 or ( (self.head.x - BLOCK_SIZE) in [s.x for s in self.snake[1:] if self.head.y == s.y] and self.direction != Direction.RIGHT):
             self.state[State.COLLISION_LEFT] = 1
-            print("COLLISION LEFT")
+            # print("COLLISION LEFT")
 
         # wall is down or self collision is down
         if self.head.y + BLOCK_SIZE == self.h or ( (self.head.y + BLOCK_SIZE) in [s.y for s in self.snake[1:] if self.head.x == s.x] and self.direction != Direction.UP):
             self.state[State.COLLISION_DOWN] = 1
-            print("COLLISION DOWN")
+            # print("COLLISION DOWN")
 
         # wall is up or self collision is up
         if self.head.y == 0 or ( (self.head.x - BLOCK_SIZE) in [s.x for s in self.snake[1:] if self.head.y == s.y] and self.direction != Direction.DOWN):
             self.state[State.COLLISION_UP] = 1
-            print("COLLISION UP")
+            # print("COLLISION UP")
 
-    def get_state(self):
+    def update_state(self):
         """
         f: food
         c: collision
@@ -182,15 +184,9 @@ class SnakeGame:
         h = self.head
         f = self.food
 
-        self._get_food_state(h, f)
+        self._update_food_state(h, f)
         
-        self._get_collision_state()
-
-        for i in range(len(self.state)):
-            if i == 4:
-                print()
-            
-            print("{} ".format(self.state[i]), end="")
+        self._update_collision_state()
         
 
     def _move(self, direction):
