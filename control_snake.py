@@ -6,18 +6,15 @@ import matplotlib.pyplot as plt
 from matplotlib import style
 from threading import Thread
 from threading import Lock
+import time
 
 mutex = Lock()
 
 style.use('fivethirtyeight')
 
-snake_commands = [Direction.UP for i in range(20)]
-snake_commands[2] = Direction.LEFT
-snake_commands[3] = Direction.DOWN
-
-GAMMA = 0.9
+GAMMA = 0.7
 EPSILON = 0.1 # such exploration, much wow
-NUM_EPISODES = 1000
+NUM_EPISODES = 10000
 TOTAL_REWARD_SUM = 0.0
 
 # initialize state-action array
@@ -77,8 +74,11 @@ def play_game():
         
         print(num_episodes + 1, " Mean reward: ", mean_r)
 
+start = time.time()
 play_game()
+end = time.time()
 
+print("\n\n-----------------------------------------------\n\nTotal time: ", end-start)
 
 plt.plot(mean_rewards)
 plt.show()

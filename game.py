@@ -25,6 +25,11 @@ class State(IntEnum):
     COLLISION_LEFT = 6
     COLLISION_DOWN = 7
 
+    DIRECTION_UP = 8
+    DIRECTION_RIGHT = 9
+    DIRECTION_LEFT = 10
+    DIRECTION_DOWN = 11
+
 Point = namedtuple('Point', 'x, y')
 
 BLACK = (0, 0, 0)
@@ -170,6 +175,16 @@ class SnakeGame:
             self.state[State.COLLISION_UP] = 1
             # print("COLLISION UP")
 
+    def _update_direction_state(self):
+        if self.direction == Direction.RIGHT:
+            self.state[State.DIRECTION_RIGHT] = 1
+        elif self.direction == Direction.UP:
+            self.state[State.DIRECTION_UP] = 1
+        elif self.direction == Direction.LEFT:
+            self.state[State.DIRECTION_LEFT] = 1
+        elif self.direction == Direction.DOWN:
+            self.state[State.DIRECTION_DOWN] = 1
+
     def update_state(self):
         """
         f: food
@@ -179,7 +194,7 @@ class SnakeGame:
          cu, cr, cl, cd]
         """ 
 
-        self.state = [0 for i in range(8)]
+        self.state = [0 for i in range(12)]
 
         h = self.head
         f = self.food
@@ -187,6 +202,8 @@ class SnakeGame:
         self._update_food_state(h, f)
         
         self._update_collision_state()
+
+        self._update_direction_state()
         
 
     def _move(self, direction):
@@ -223,7 +240,7 @@ class SnakeGame:
         # draw food
         pygame.draw.rect(self.display, RED, pygame.Rect(self.food.x, self.food.y, BLOCK_SIZE, BLOCK_SIZE))
 
-        text = font.render("head: " + str("{}, {}".format(self.head.x, self.head.y)), True, WHITE)
+        text = font.render("Score: " + str(self.score), True, WHITE)
         self.display.blit(text, [0, 0])
         pygame.display.flip() # ????
 
