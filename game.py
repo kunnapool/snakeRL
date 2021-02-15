@@ -13,7 +13,6 @@ class Direction(Enum):
 
 Point = namedtuple('Point', 'x, y')
 
-
 BLACK = (0, 0, 0)
 WHITE = (255, 255, 255)
 RED = (200, 0, 0)
@@ -78,6 +77,7 @@ class SnakeGame:
                 pygame.quit()
                 quit()
 
+            # a keystroke occurred
             if event.type == pygame.KEYDOWN:
 
                 # Don't allow 180 turns
@@ -113,6 +113,9 @@ class SnakeGame:
 
 
     def _move(self, direction):
+        """
+        Move one block in "direction" direction
+        """
 
         x = self.head.x
         y = self.head.y
@@ -129,18 +132,23 @@ class SnakeGame:
         self.head = Point(x, y)
 
     def _update_ui(self):
+        """
+        Update UI/game board
+        """
 
         self.display.fill(BLACK)
 
+        # draw snake
         for pt in self.snake:
             pygame.draw.rect(self.display, BLUE1, pygame.Rect(pt.x, pt.y, BLOCK_SIZE, BLOCK_SIZE))
             pygame.draw.rect(self.display, BLUE2, pygame.Rect(pt.x+4, pt.y+4, 12, 12))
 
+        # draw food
         pygame.draw.rect(self.display, RED, pygame.Rect(self.food.x, self.food.y, BLOCK_SIZE, BLOCK_SIZE))
 
         text = font.render("Score: " + str(self.score), True, WHITE)
         self.display.blit(text, [0, 0])
-        pygame.display.flip()
+        pygame.display.flip() # ????
 
 
 if __name__ == "__main__":
