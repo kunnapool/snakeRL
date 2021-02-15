@@ -1,3 +1,6 @@
+from os import environ
+environ['PYGAME_HIDE_SUPPORT_PROMPT'] = '1'
+
 import pygame
 import random
 from enum import Enum
@@ -29,6 +32,7 @@ font = pygame.font.SysFont('arial', 25)
 class SnakeGame:
 
     def __init__(self, w=640, h=480):
+
         self.w = w
         self.h = h
 
@@ -70,25 +74,20 @@ class SnakeGame:
         
         return False
 
-    def play_step(self):
+    def play_step(self, move):
+        """
+        Play one step - one move only
+        """
 
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                pygame.quit()
-                quit()
-
-            # a keystroke occurred
-            if event.type == pygame.KEYDOWN:
-
-                # Don't allow 180 turns
-                if event.key == pygame.K_LEFT and self.direction != Direction.RIGHT:
-                    self.direction = Direction.LEFT
-                elif event.key == pygame.K_DOWN and self.direction != Direction.UP:
-                    self.direction = Direction.DOWN
-                elif event.key == pygame.K_UP and self.direction != Direction.DOWN:
-                    self.direction = Direction.UP
-                elif event.key == pygame.K_RIGHT and self.direction != Direction.LEFT:
-                    self.direction = Direction.RIGHT
+            # Don't allow 180 turns
+        if move == Direction.LEFT and self.direction != Direction.RIGHT:
+            self.direction = Direction.LEFT
+        elif move == Direction.DOWN and self.direction != Direction.UP:
+            self.direction = Direction.DOWN
+        elif move == Direction.UP and self.direction != Direction.DOWN:
+            self.direction = Direction.UP
+        elif move == Direction.RIGHT and self.direction != Direction.LEFT:
+            self.direction = Direction.RIGHT
 
 
         self._move(self.direction)
@@ -150,20 +149,3 @@ class SnakeGame:
         self.display.blit(text, [0, 0])
         pygame.display.flip() # ????
 
-
-if __name__ == "__main__":
-
-    while True:
-        game = SnakeGame()
-
-        # main loop
-        while True:
-            game_over, score = game.play_step()
-
-            if game_over:
-                break
-
-        print("Score: ", score)
-
-        # pygame.quit()
-        # pygame.init()
